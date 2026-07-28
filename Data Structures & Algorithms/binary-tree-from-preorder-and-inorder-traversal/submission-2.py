@@ -1,0 +1,44 @@
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        indices = {}
+        for idx, val in enumerate(inorder):
+            indices[val] = idx
+        self.pre_idx = 0
+        def dfs(preorder, inorder):
+            if not preorder and not inorder:
+                return None
+            root = TreeNode(preorder[0])
+            mid = indices[root.val]
+            root.left = self.buildTree(preorder[1:mid + 1], inorder[:mid])
+            root.right = self.buildTree(preorder[mid + 1:], inorder[mid+1:])
+            return root
+        return dfs(preorder, inorder)
+
+
+
+
+    def buildTree_og(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        """
+        pre: first == root
+            [1,2,3,4]
+        in: first == leftmost
+            [2,1,3,4]
+        
+        use pre to get the root by pre[0]
+        then, find the index from inorder, and the left elements of that index, is the left side of the tree, otherwise the right side
+        """
+        if not preorder and not inorder:
+            return None
+        
+        root = TreeNode(preorder[0])
+        root_idx = inorder.index(preorder[0])
+        root.left = self.buildTree(preorder[1:root_idx+1], inorder[:root_idx]) # left tree preorder: from the first node, count the len of the nodes in inoder before root_idx
+        root.right = self.buildTree(preorder[root_idx+1:], inorder[root_idx+1:]) # right tree preorder: the rest part of the len of left tree
+        return root
